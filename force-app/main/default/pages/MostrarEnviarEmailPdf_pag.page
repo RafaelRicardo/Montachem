@@ -1,0 +1,57 @@
+<apex:page controller="MostrarEnviarEmailPdf_ctr" >
+<apex:form id="formId">
+
+
+  <apex:actionFunction name="change" reRender="formulario"/>
+  <apex:pageBlock id="formulario">
+    <apex:pageMessages ></apex:pageMessages>
+
+
+<center>
+   <table>
+   
+   <tr><td>  Save and email quote PDF? <apex:inputCheckbox value="{!bolEnviarEmail}" onclick="change();"/><br/></td></tr>
+   <tr><td>  <apex:outputLabel rendered="{!bolEnviarEmail}" value="Contact Email:"></apex:outputLabel>    <apex:outputLabel rendered="{!bolEnviarEmail}" value="{!ContactoEmail}"/></td></tr>
+   <tr><td>  <apex:outputLabel rendered="{!bolEnviarEmail}" value="Aditional email"></apex:outputLabel> <apex:inputtext rendered="{!bolEnviarEmail}" id="email" value="{!AditionalEmail}"/>   </td></tr>
+   <tr><td>  <apex:commandButton value="Save Order PDF" action="{!GuardarEnviarEmailPdf}" onclick="return emailval();"  /><apex:commandButton value="Volver" action="{!volver}"  /></td></tr>
+   </table>
+          
+</center>
+</apex:pageBlock>
+ 
+<apex:pageBlock id="pb">
+   <iframe height="800" width="100%" src="{!UrlPdf}" ></iframe>
+
+  
+  </apex:pageBlock>
+
+
+
+<script>
+
+function emailval()
+{
+   try
+   {
+        var campo = document.getElementById('{!$Component.formId.formulario.email}').value;
+        if(campo.trim().length==0)
+        {
+           return true;
+        }
+        var emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
+        //Se muestra un texto a modo de ejemplo, luego va a ser un icono
+        if (emailRegex.test(campo)) {
+          return true;
+        } else {
+          alert("incorrect [Aditional email] field");
+          return false;
+        }
+    }catch(err) 
+    {
+       return true;
+    }
+ }
+ </script>
+
+</apex:form>
+</apex:page>

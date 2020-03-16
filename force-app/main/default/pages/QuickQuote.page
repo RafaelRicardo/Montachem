@@ -1,0 +1,1877 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0"
+ extensions="createQuickQuote_ctr" standardController="Account">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>      
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.1.62/jquery.inputmask.bundle.js"></script>  
+    <head>
+    
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title>SLDS LatestAccounts Visualforce Page in Salesforce Mobile</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Import the Design System style sheet -->
+        <apex:slds />
+        
+        
+         <script>
+         
+            
+            var j$ = jQuery.noConflict();
+            
+            window.onload = function() {
+            
+                // si es la modificación de una cotización existente se asigna el valor del campo delivery place
+                if(jQuery('[id$=deliveryPlace]').val() != '' && jQuery('[id$=deliveryPlace]').val() != null){
+                    jQuery('[id$=deliveryPlaceInput]').val(jQuery('[id$=deliveryPlaceName]').val());
+                    jQuery('[id$=deliveryPlaceInput]').attr('id', jQuery('[id$=deliveryPlace]').val());
+                
+                }
+                if(jQuery('[id$=NotifyId]').val() != '' && jQuery('[id$=NotifyId]').val() != null){
+                    jQuery('[id$=NotifyInput]').val(jQuery('[id$=NotifyName]').val());
+                    jQuery('[id$=NotifyInput]').attr('id', jQuery('[id$=NotifyId]').val());
+                }
+                if(jQuery('[id$=ConsigneeId]').val() != '' && jQuery('[id$=ConsigneeId]').val() != null){
+                    jQuery('[id$=ConsigInput]').val(jQuery('[id$=ConsigneeName]').val());
+                    jQuery('[id$=ConsigInput]').attr('id', jQuery('[id$=ConsigneeId]').val());
+                }
+                
+                
+                maskFields();
+            };
+            
+            function show(o)
+            {
+                var obj         = o.nextSibling.nextSibling.id;
+                
+                var imageTagObj = o.children[0].children[0].children[0].tagName;
+              
+                
+                if(document.getElementById(obj).style.display == 'none')
+                {
+                    document.getElementById(obj).style.display = 'block';
+                }
+                else
+                    document.getElementById(obj).style.display = 'none';
+            }
+            
+            
+            function desplegar() {
+                searchServer(
+                  document.getElementById("nombreProd").value
+                  //,document.getElementById("familia").value,
+                  //document.getElementById("grupo").value,
+                  //document.getElementById("subgrupo").value
+                  );
+          
+          
+                //alert("p");
+                var list2= new Array();
+                list2=document.getElementById('blockTable');
+                alert("list2:"+list2.length);
+            }
+            
+            function doSearch() {
+                searchServer(
+                  document.getElementById("nombreProd").value
+                  );
+          
+          
+                //alert("p");
+                var list2= new Array();
+                list2=document.getElementById('blockTable');
+                alert("list2:"+list2.length);
+            }
+            
+            function dbuscarProducto() {
+                searchServer(
+                  document.getElementById("nombreProd").value
+                  );
+                  
+                  
+                //alert("p");
+                var list2= new Array();
+                list2=document.getElementById('blockTable');
+                alert("list2:"+list2.length);
+            }
+            
+             // Funcion que contiene la definición del mask para los campos de añño
+        function maskFields ()
+        {
+            console.log('paso 0.0');
+            <!--YEARS FIELDS MASK -->
+            var tb = [{ "mask": "###########.##"}, { "mask": "###########.##"}];
+              j$(".decimal").inputmask('decimal', {
+                rightAlign: true
+              });
+              
+             j$(".currency").inputmask('currency', {
+                rightAlign: true
+              });
+              j$(".custom1").inputmask({
+                mask: "99[.99]",
+                greedy: false,
+                definitions: {
+                  '*': {
+                    validator: "[0-9]"
+                  }
+                },
+                rightAlign: true
+              });
+              j$(".custom2").inputmask({ 'alias': 'decimal', 'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0.00', rightAlign : true,clearMaskOnLostFocus: !1 });
+              
+              j$(".custom3").inputmask({
+                'alias': 'decimal',
+                'mask': "99[.99]",
+                rightAlign: true
+              });
+             j$('.maskDecimalField').inputmask({
+                'alias': 'decimal',
+                'mask': "9999999999999[.99]",
+                rightAlign: true
+              }); 
+             
+            j$(".custom4").inputmask('Regex', {regex: "^[0-9]{1,6}(\\.\\d{1,3})?$"});
+            //j$(".numeric").numeric({ decimal : ".",  negative : false, scale: 3 });
+                
+            console.log('paso 1.2');
+            
+                    }
+            
+        </script>
+            
+    </head>     
+    <body>
+    
+    <div class="slds-scope" >
+    
+
+    
+    <apex:form >
+        <!-- En caso de ser la edición de una cotización existente, estos campos hidden contentrán los valores iniciales de posting y delivery date -->
+        <apex:inputHidden value="{!deliveryDateOld}" id="deliveryDateOld"/>
+        
+        <apex:inputHidden value="{!postingDateOld}" id="postingDateOld"/><!--DARF-->
+        <apex:inputHidden value="{!contactoEmail}" id="contactoEmail"/>
+    </apex:form>
+
+    
+                    
+    <!-- Sección notificaciones de error -->
+        <div   class="slds-notification-container" id="errorSection">
+         
+          <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <span class="slds-assistive-text">error</span>
+                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                    <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                            <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#error')}"></use>
+                    </svg>
+                </span>
+                <h2 id="errorMessage">
+                </h2>
+                <div class="slds-notify__close">
+                    <button class="slds-button slds-button_icon slds-button_icon-small slds-button_icon-inverse" onclick="j$('#errorSection').hide();" title="Close">
+                      <svg class="slds-button__icon" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                      </svg>
+                      <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+            </div>
+        
+        
+        </div>            
+                 
+            
+    
+    
+      
+                    
+    <!-- Sección -->
+     <apex:form >    
+     
+        <!-- campos ocultos para mostrarse usando StandardController usados en el controlador -->
+        <apex:outputText value="{!account.name}" rendered="false"/> 
+        <apex:outputText value="{!account.Payment_term__c}" rendered="false"/> 
+         
+     
+     
+        <apex:actionFunction name="searchServer" action="{!runSearch}" rerender="block2,errors">
+          <apex:param name="productName" value="" />
+        </apex:actionFunction>
+        
+        
+        <apex:actionFunction name="asignarSelectedProd" action="{!assignProductDetailFields}" oncomplete="showOnlyOne('selectedProductSection', 'New');" rerender="block3">   
+             <apex:param name="productId" value="" />
+        </apex:actionFunction>
+            
+        <apex:actionFunction name="asignarEditProd" action="{!assignEditProductDetailFields}" oncomplete="showOnlyOne('selectedProductSection', 'Edit');" rerender="block3">   
+             <apex:param name="productId" value="" />
+        </apex:actionFunction>
+            
+                
+    </apex:form>
+    
+      
+        
+        <script>    
+          
+
+             // Expande unicamente la sección enviada como parametro dependiendo de si n hay errores en quote section
+            function expandOnlyOneSection(obj)
+            {   
+                j$('.slds-section').removeClass('slds-is-open');
+                j$('#'+obj).show();
+                j$('#'+obj).addClass('slds-is-open');
+                j$('#'+obj).find('.slds-section__content').show();
+                
+                maskFields();
+       
+            }
+            
+             // Expande unicamente la sección enviada como parametro dependiendo de si no hay errores en quote section
+            function nextSection(obj)
+            {   
+                var error = '' ;
+                error = validateQuoteSection();
+                
+                if (error == '' ){
+                    
+                    expandOnlyOneSection(obj);
+                }
+                
+                maskFields();
+       
+            }
+                
+             // Cuando presiona el botón Next de la sección Quote, en caso de no haber error se mostrará la siguiente sección
+            function nextSection(obj)
+            {   
+                var error = '' ;
+                error = validateQuoteSection();
+                
+                if (error == '' ){
+                    
+                    expandOnlyOneSection(obj);
+                }
+                
+                maskFields();
+       
+            }
+            
+             // Para agregar el producto al carro debe pasar las validaciones
+            function agregarAlCarro(action)
+            {   
+                j$('#errorSection').hide();
+                j$('.slds-text-color_error').hide();
+                var error = '' ;
+                error = validateQuoteSection();
+                    
+                
+            
+                if (error == '' ){
+                     //alert('listPrice:'+'{!currentSelectedProduct.listPrice}');
+                     
+                    if(jQuery('[id$=originport]').val()== '' ){
+                        error = ' Please check empty fields';
+                        j$('#originportError').show();
+                        document.getElementById('originportError').innerHTML=' Origin port is mandatory';
+                    }
+                    
+                    if(jQuery('[id$=quantity]').val()== ''  || jQuery('[id$=quantity]').val()<=0 ){
+                        error = ' Please check empty fields';
+                        j$('#quantityError').show();
+                        document.getElementById('quantityError').innerHTML=' Quantity is mandatory and must be greater than 0';
+                    }
+                    
+                    if(jQuery('[id$=salesPrice]').val()== ''  || jQuery('[id$=salesPrice]').val()<=0){
+                        error = ' Please check empty fields';
+                        j$('#salesPriceError').show();
+                        document.getElementById('salesPriceError').innerHTML='Sales price is mandatory and must be greater than 0';
+                    }
+                    
+                     
+                    if(error != '' ){
+                        j$('#errorSection').show();
+                        document.getElementById("errorMessage").innerHTML= error;
+                    }else{
+                        /*darf 19/02/2020   
+                        error =validateCalculatePrice();
+                        if (error != '' ){
+                        }else{
+                        */
+                            if (action=='Edit'){
+                                addEdition();
+                            }else{
+                                addToCart();
+                            }
+                        /*darf 19/02/2020   }*/
+                    }
+                    
+                }
+                
+                maskFields();
+       
+            }
+            
+             // Para agregar el producto al carro 
+        /*function validateCalculatePrice()
+            {
+                var error = '' ;
+                j$('#errorSection').hide();
+                j$('.slds-text-color_error').hide();
+                
+                    if(jQuery('[id$=listPrice]').text()== ''  || jQuery('[id$=listPrice]').text()== null){
+                        j$('#originportError').show();
+                        error =' Port of origin, Place of delivery and container are not set in Freights table.Contact  T.O.'
+                        document.getElementById('originportError').innerHTML=error;
+                    }
+    
+                maskFields();
+                return error;
+       
+            }*/
+            
+            // Para agregar el producto al carro
+            function guardarQuote (closeWindow)
+            {   
+                showLoading();
+                var error = '';
+                error = validateQuoteSection();
+                error= validateProduct();
+                
+                if (error == '' ){
+                    //DARFCUSTOMER
+                    console.log('integervalue:entor if---');//darf
+                    guardar(      
+                            jQuery('[id$=CustomerRef]').val(),
+                            jQuery('[id$=paymentTerm]').val(),
+                            jQuery('[id$=incoterms]').val(),
+                            jQuery('[id$=deliveryPlace]').val(),
+                            jQuery('[id$=deliveryDate]').val(),
+                            jQuery('[id$=postingDate]').val(),
+                            jQuery('[id$=contact]').val(),
+                            jQuery('[id$=Commission]').val(),
+                            jQuery('[id$=newContactName]').val(),
+                            jQuery('[id$=newContacLast]').val(),
+                            jQuery('[id$=newContacEmail]').val(),
+                            jQuery('[id$=NotifyId]').val(),
+                            jQuery('[id$=ConsigneeId]').val(),
+                            closeWindow
+                        );
+                }else {
+                    
+                 hideLoading();
+                }
+                
+                maskFields();
+       
+            }
+            
+            // Para agregar el producto al carro 
+            function enviarQuote()
+            {   
+                var error = '' ;
+                console.log('enviarQuote1 error:'+error);
+                error = validateQuoteSection();
+                
+                console.log('enviarQuote error:'+error);
+                
+                if (error == '' ){
+                    
+                    enviarPDF();
+                }
+                
+                maskFields();
+       
+            }
+            
+        // DARF 9/03/2020
+        function validateProduct()
+        {
+            var error = '' ;
+            
+            var integervalue ='{!cantProdAdded}';
+            console.log('integervalue:'+jQuery('[id$=quantityProducts]').val()+'---');//darf
+            if(jQuery('[id$=quantityProducts]').val()<1 ){
+                error='You could not create a quote without selecting products';
+                j$('#errorSection').show();
+                document.getElementById("errorMessage").innerHTML='ss'+ error;
+            }
+            return error;
+        }
+                        
+             // Muestra u oculta unicamente la sección enviada como parametro dependiendo de si toHide es true o no
+            function validateQuoteSection()
+            {
+                
+                j$('#errorSection').hide();
+                var error = '' ;
+                                
+                if(jQuery('[id$=incoterms]').val()== '' ){
+                    error = ' Incoterms';
+                }
+                
+                if(jQuery('[id$=deliveryPlace]').val()== '' ){
+                    error = error+ ', Place of delivery';
+                }
+                
+                if(jQuery('[id$=deliveryDate]').val()== '' ){
+                    error = error+ ', Delivery date';
+                }
+                if(jQuery('[id$=CustomerRef]').val().length > 50 ){
+                    error = error+ ', Customer Ref can contain a maximum of 50 characters';
+                }
+                
+                
+                if(jQuery('[id$=postingDate]').val()== '' ){
+                    error = error+ ', Posting date';
+                }
+                
+                
+                if( (jQuery('[id$=contact]').val()== '' || jQuery('[id$=contact]').val()== null) && jQuery('[id$=createContact]').is(":checked") ==false){
+                    error = error+ ', Contact';
+                }
+                
+                if( (jQuery('[id$=newContacLast]').val()== '' || jQuery('[id$=newContacLast]').val()== null) && jQuery('[id$=createContact]').is(":checked") ==true){
+                    error = error+ ', Last name';
+                }
+                if(error != '' ){
+                    j$('#errorSection').show();
+                    document.getElementById("errorMessage").innerHTML='Fields in Quote section cannot be empty:'+ error;
+                    return error;
+                }
+
+                
+                error =validateQuoteDates();
+
+                if(error != '' ){
+                    j$('#errorSection').show();
+                    document.getElementById("errorMessage").innerHTML='Fields in Quote section cannot be empty:'+ error;
+                }
+            
+                return error;
+            }
+
+
+             // Validar las fechas de la sección Quote
+            function validateQuoteDates()
+            {
+                var error = '' ;
+                j$('.slds-text-color_error').hide();
+                
+                var arrDeliveryDate = jQuery('[id$=deliveryDate]').val().split("-"); 
+                var fechDelivery = new Date(arrDeliveryDate[0],arrDeliveryDate[1]-1,arrDeliveryDate[2]);
+                    console.log('Delivery date:'+ jQuery('[id$=deliveryDate]').val()+'-');
+                    console.log('fechDelivery:'+fechDelivery+'-');
+                
+                var arrDeliveryDateOld = jQuery('[id$=deliveryDateOld]').val().split("-"); 
+                var fechDeliveryOld = new Date(arrDeliveryDateOld[0],arrDeliveryDateOld[1]-1,arrDeliveryDateOld[2]);
+                console.log('Delivery date old:'+ jQuery('[id$=deliveryDateOld]').val()+'-');
+                console.log('fechDeliveryOld:'+fechDeliveryOld+'-');
+                
+                
+                var arrPostingDate = jQuery('[id$=postingDate]').val().split("-"); 
+                var fechPosting  = new Date(arrPostingDate[0],arrPostingDate[1]-1,arrPostingDate[2]);
+                    console.log('Posting date:'+ jQuery('[id$=postingDate]').val()+'-');
+                    console.log('fechPosting:'+fechPosting+'-');
+                    
+                var arrPostingDateOld = jQuery('[id$=postingDateOld]').val().split("-"); 
+                var fechPostingOld  = new Date(arrPostingDateOld[0],arrPostingDateOld[1]-1,arrPostingDateOld[2]);
+                console.log('Posting date old:'+ jQuery('[id$=postingDateOld]').val()+'-');
+                console.log('CustomerRef:'+ jQuery('[id$=CustomerRef]').val()+'-');//darf
+                console.log('fechPostingOld:'+fechPostingOld+'-');
+        
+                    
+                var postDatePlusFive = new Date();
+                var today = new Date(); 
+                today.setHours(0,0,0,0);
+                
+                postDatePlusFive.setDate(fechPosting.getDate()+5);
+                console.log('postDatePlusFive:'+postDatePlusFive+'-');
+                
+                
+                // si es una cotización nueva fechPostingOld debe estar nula y se valida que no sea menor a la fecha actual pero 
+                // si es es la modificación de una quote existente  y no se cambia la fecha, no se debe realizar la validación a menos que se modifique.
+                if ( ((fechDeliveryOld == ''  || fechDeliveryOld ==null) && postDatePlusFive > fechDelivery ) ||
+                     ( fechDeliveryOld != ''  && fechDeliveryOld !=null && postDatePlusFive > fechDelivery && ( fechPosting.getTime() != fechPostingOld.getTime() || fechDeliveryOld.getTime() != fechDelivery.getTime() ) ) ){
+                    
+                    		/*error = 'Delivery date must be greater than Posting Date plus five days';*/
+                    		error='The delivery date must be greater than the current date plus five days';
+                            j$('#deliveryDateError').show();
+                            document.getElementById('deliveryDateError').innerHTML=error;
+                }
+                
+                // si es una quote nueva fechPostingOld debe ser nula y se valida que no < a la fecha actual pero 
+                // si es modificación de una quote existente y no se cambia la fecha, no se debe realizar la validación a menos que se modifique.
+                if ( ((fechPostingOld == ''  || fechPostingOld ==null) && fechPosting < today ) ||
+                     ( fechPostingOld != ''  && fechPostingOld !=null && fechPosting < today && fechPosting.getTime() != fechPostingOld.getTime() ) ){
+                    
+                            error = 'Posting date must be greater than or equal to today';
+                            j$('#postingDateError').show();
+                            document.getElementById('postingDateError').innerHTML=error;
+                }
+                
+                return error;
+            }
+            
+            
+
+             // Muestra u oculta unicamente la sección enviada como parametro 
+            function expand(obj)
+            {
+                j$('#'+obj).show();
+                j$('#'+obj).addClass('slds-is-open');
+                j$('#'+obj).find('.slds-section__content').show();
+                maskFields();
+            }
+            
+        
+
+             // Muestra u oculta unicamente la sección enviada como parametro dependiendo de si toHide es true o no
+            function showHideNewContact(obj)
+            {   
+                if(obj.checked){ 
+                    j$('#createContactSection').show();
+                }else{
+                    j$('#createContactSection').hide();
+                }
+                maskFields();
+       
+            }
+        
+            // muestra unicamente la sección enviada como parametro
+            function showOnlyOne(obj,action)
+            {
+                var error = '' ;
+                error = validateQuoteSection();
+                
+                if (error == '' ){
+                    j$('.slds-text-color_error').hide();
+                    j$('.slds-section').hide();
+                    j$('.slds-section').removeClass('slds-is-open');
+                    j$('#'+obj).show();
+                    j$('.slds-section').addClass('slds-is-open');
+                    j$('#'+obj).find('.slds-section__content').show();
+                    
+                    if(action=='Edit'){
+                    
+                        j$('#'+'addButton').hide();
+                        j$('#'+'editButton').show();
+                     
+                    }else {
+                        j$('#'+'addButton').show();
+                        j$('#'+'editButton').hide();
+                    }
+                    
+                }
+                maskFields();
+                
+            }
+        
+            // oculta unicamente la sección enviada como parametro
+            function hideOnlyOne(obj)
+            {
+
+                j$('.slds-section').show();
+                j$('.slds-section').removeClass('slds-is-open');
+                j$('#'+obj).hide();
+                maskFields();
+                
+            }
+            
+            // Después de validar invoca función que recalcula listprice y salesprice de los productos seleccionados.
+            function updateSalesPrices(){
+            
+                if ( jQuery('[id$=quantityProducts]').val() != '0') 
+                {
+                    
+                    var r = confirm ("If you change payment term, sales prices of current added products will change too. Do you want to continue?");
+                    
+                    if ( r == true ) 
+                    {
+                            
+                        error = validateQuoteSection();
+                        var error = '' ; 
+                        
+                        if ( error == '' )
+                        {
+                            
+                            j$('#errorSection').hide();
+                            
+                            recalculateSalesPrices(
+                                jQuery('[id$=paymentTerm]').val(),
+                                jQuery('[id$=deliveryPlace]').val()
+                            );
+                            
+                        }else
+                        {
+                            j$('#errorSection').show();
+                            document.getElementById("errorMessage").innerHTML = error;
+                            
+                        }
+                    }
+                    
+                }
+                
+            }
+        
+            
+            // asignar valores de la cotización
+            function asignarValoresControlador(element){
+                
+                var error = '' ;
+                error = validateQuoteSection();
+                
+                if (error == '' ){
+                    
+                    j$('#errorSection').hide();
+                    
+                    refreshPrice(       
+                        jQuery('[id$=paymentTerm]').val(),
+                        jQuery('[id$=incoterms]').val(),
+                        jQuery('[id$=deliveryPlace]').val(),
+                        jQuery('[id$=deliveryDate]').val(),
+                        jQuery('[id$=postingDate]').val(),
+                        jQuery('[id$=contact]').val()
+                    )
+                }else{
+                    j$('#errorSection').show();
+                    document.getElementById(element).style.display='block';
+                    document.getElementById(element).innerHTML='Place of delivery is mandatory';
+                    
+                }
+                
+            }
+        
+         // asignar valores de la cotización
+            function asignarContactEmail(element, email){
+             
+                if(email==null || email == ''){
+                     jQuery('[id$=contactoEmail]').val(email); //assignContactEmail(email);
+                }
+            }
+            
+        </script>       
+
+         <!-- centered title -->
+         
+        <div class="slds-text-align--center">
+         
+            <div class="slds-text-heading--large">Quick quote creation</div>
+         
+        </div>
+ 
+         <!-- End centered title -->
+         
+         
+    
+    
+         <!------------------------- Quote section ------------------------------------->
+    <div id="quoteSection" class="slds-section">
+    
+    
+        <!-- Accordion Title  -->
+        <h3 class="slds-section__title">
+        <button class="slds-button slds-section__title-action">
+              <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+              
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                        
+              </svg>  
+            Quote
+        </button>   
+        </h3>
+        <!-- End accordion Title  -->
+        
+        <div id="quoteInformation" class="slds-section__content">
+            
+            <apex:form >  
+            
+            <apex:outputPanel id="quoteInformationPanel">
+            
+                <!-- ayuda setear de los valores ingresalos en el formulario a las variable del controlador -->
+                <apex:actionsupport event="onclick" rerender=""/>
+           
+               
+                <div class="slds-grid slds-wrap">
+                 
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Quote name</label>
+                     
+                        <apex:input styleClass="slds-input" value="{!quoteName}"/>
+                     
+                    </div>
+                        
+                               
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                     
+                          <label class="slds-form-element__label" for="text-input-01">Payment term</label>
+                         
+                                                         
+                            <apex:selectList id="paymentTerm"   styleClass="slds-input slds-combobox__inpu" value="{!paymentTerm}" onchange="updateSalesPrices();" multiselect="false" size="1">
+                                    <apex:selectOptions value="{!paymentTermsOptionList}" />
+                            </apex:selectList>
+                         
+                         
+                     
+                    </div>
+                
+                 
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Incoterms</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                          
+                        <apex:selectList id="incoterms"   styleClass="slds-input slds-combobox__inpu" value="{!incoterms}" multiselect="false" size="1">
+                                <apex:selectOptions value="{!incotermsOptionList}" />
+                        </apex:selectList>
+                     
+                      </div>
+                     
+                    </div>   
+                    
+                 
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                     
+                     
+                      <!-- div class="slds-form-element__control"-->
+                     
+                            <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
+                            
+                              <label class="slds-form-element__label" for="text-input-01">Place of delivery</label>
+                      
+                              <div class="slds-form-element">
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                                  <input id="deliveryPlaceInput" value="" class="slds-input" type="text" autocomplete="off" aria-autocomplete="list" role="combobox" 
+                                         onkeyup="getPortList(this.id)" aria-expanded="false" aria-activedescendant="" />
+                                </div>
+                              </div>
+                              
+                              <div class="slds-lookup__menu" role="listbox" id="results" style="display:none">
+                                <div class="slds-lookup__item">
+                                </div>
+                                <ul class="slds-lookup__list" role="presentation" id="ui_results">                                                                                       
+                                </ul>                           
+                              </div>
+
+                            </div>
+                     
+                                <!-- Valor del place of delivery elegido  -->
+                                <apex:inputHidden value="{!deliveryPlace}" id="deliveryPlace"/>
+                                <apex:inputHidden value="{!deliveryPlaceName}" id="deliveryPlaceName"/>
+                        <!--apex:selectList id="deliveryPlace"   styleClass="slds-input slds-combobox__inpu" value="{!deliveryPlace}" multiselect="false" size="1">
+                                <apex:selectOptions value="{!portsOptionList}" />
+                        </apex:selectList -->
+                     
+                      <!-- /div -->
+                     
+                   </div>
+                 
+                </div>
+            
+             
+                <div class="slds-m-top--small"></div>
+             
+                  
+        <script>        
+            
+            function getPortList(element){
+                       j$('#results').css("display","block");
+                       console.log('getPortList1');
+                       j$('#'+element).attr('aria-expanded','true'); 
+                       console.log('getPortList2');
+                       j$('#keyword').html(j$('#'+element).val());
+                       console.log('getPortList3');
+                       Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.createQuickQuote_ctr.queryPorts}',
+                        j$('#'+element).val(),                                                 
+                         function(result, event){
+                         
+                            console.log('getPortList4 event:'+event.status);
+                            if (event.status) {
+                                j$('#ui_results').empty();
+                                populateLookup(result, element);
+                                console.log('getPortList5');
+                            } else if (event.type === 'exception') {
+                                j$('#'+element) = 'ERROR: ' + event.message;   
+                            } else {
+                                j$('#'+element) = 'ERROR: ' + event.message;
+                            }
+                        }, 
+                        {escape: true}
+                        );  
+            
+                }
+                
+                function getAccountList(element){
+                    console.log('getAccount '+ j$('#'+element).val());
+                       j$('#resultsNoti').css("display","block");
+                       j$('#'+element).attr('aria-expanded','true'); 
+                       j$('#keyword').html(j$('#'+element).val());
+                       Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.createQuickQuote_ctr.queryAccounts}',
+                        j$('#'+element).val(),                                                 
+                         function(result, event){
+                            if (event.status) {
+                                j$('#ui_resultsNoti').empty();
+                                populateLookup2(result, element);
+                               
+                            } else if (event.type === 'exception') {
+                                j$('#'+element) = 'ERROR: ' + event.message;   
+                            } else {
+                                j$('#'+element) = 'ERROR: ' + event.message;
+                            }
+                        }, 
+                        {escape: true}
+                        );  
+            
+                }
+                
+                function getAccountConsigList(element){
+                    console.log('getConsig '+ j$('#'+element).val());
+                       j$('#resultsConsig').css("display","block");
+                       j$('#'+element).attr('aria-expanded','true'); 
+                       j$('#keyword').html(j$('#'+element).val());
+                       Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.createQuickQuote_ctr.queryAccounts}',
+                        j$('#'+element).val(),                                                 
+                         function(result, event){
+                             console.log('getPortList4 event: '+event.status);
+                            if (event.status) {
+                                j$('#ui_resultsConsig').empty();
+                                populateLookup3(result, element);
+								console.log('getPortList5');                               
+                            } else if (event.type === 'exception') {
+                                j$('#'+element) = 'ERROR: ' + event.message;   
+                            } else {
+                                j$('#'+element) = 'ERROR: ' + event.message;
+                            }
+                        }, 
+                        {escape: true}
+                        );  
+            
+                }
+            
+            
+                function populateLookup(result, element){
+                         if(result){                        
+                                j$( result ).each(function() {                        
+                                    j$('#ui_results').append('<li class="slds-lookup__item">' + 
+                                            '<a id="' + this.Id + '" href="javascript:void(0)" role="option">' + 
+                                              this.Name+'</a>' + 
+                                          '</li>');
+                                          
+                                });
+                        
+
+                        j$('ul.slds-lookup__list a').click(function(e) 
+                            {         
+
+                                j$('#'+element).val(j$(this)[0].innerText);
+                                j$('#'+element).attr('aria-activedescendant',j$(e.currentTarget).attr('id'));
+                                j$('#'+element).attr('aria-expanded','false');
+
+                                j$('#results').css("display","none");
+                                                                
+                                // se asigna el valor a inputHidden                             
+                                jQuery('[id$=deliveryPlace]').val(j$(e.currentTarget).attr('id'));
+                                
+                                updateSalesPrices();
+                            }); 
+                        }
+                }
+                
+                function populateLookup2(result, element){
+                         if(result){                        
+                                j$( result ).each(function() {                        
+                                    j$('#ui_resultsNoti').append('<li class="slds-lookup__item">' + 
+                                            '<a id="' + this.Id + '" href="javascript:void(0)" role="option">' + 
+                                              this.Name+'</a>' + 
+                                          '</li>');
+                                });
+
+                        j$('ul.slds-lookup__list a').click(function(e) 
+                            {         
+                      
+                                j$('#'+element).val(j$(this)[0].innerText);
+                                j$('#'+element).attr('aria-activedescendant',j$(e.currentTarget).attr('id'));
+                                j$('#'+element).attr('aria-expanded','false');
+
+                                j$('#resultsNoti').css("display","none");
+                                                                
+                                // se asigna el valor a inputHidden                             
+                                jQuery('[id$=NotifyId]').val(j$(e.currentTarget).attr('id'));
+                                
+                                //updateSalesPrices();
+                            }); 
+                        }
+                }
+                
+                function populateLookup3(result, element){
+                         if(result){                        
+                                j$( result ).each(function() {                        
+                                    j$('#ui_resultsConsig').append('<li class="slds-lookup__item">' + 
+                                            '<a id="' + this.Id + '" href="javascript:void(0)" role="option">' + 
+                                              this.Name+'</a>' + 
+                                          '</li>');
+                                });
+                        
+
+                        j$('ul.slds-lookup__list a').click(function(e) 
+                            {         
+                      
+                                j$('#'+element).val(j$(this)[0].innerText);
+                                j$('#'+element).attr('aria-activedescendant',j$(e.currentTarget).attr('id'));
+                                j$('#'+element).attr('aria-expanded','false');
+
+                                j$('#resultsConsig').css("display","none");
+                                                                
+                                // se asigna el valor a inputHidden                             
+                                jQuery('[id$=ConsigneeId]').val(j$(e.currentTarget).attr('id'));
+                                
+                                //updateSalesPrices();
+                            }); 
+                        }
+                }
+            
+                j$(document).ready(function() 
+                 {  
+                     
+                });
+       
+        </script>    
+        
+                <div class="slds-grid slds-wrap"> <!---- segundo conjunto de campos --->
+                 
+                                  
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4" >
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Delivery date</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:input id="deliveryDate" type="date" styleClass="slds-input" value="{!deliveryDate}"/>
+                        <div id="deliveryDateError"  class="slds-text-color_error">  </div>
+                      </div>
+                     
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4" >
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Customer Ref</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <!-- apex:inputField styleClass="slds-input" value="{!quote.DocDate__c}"/ -->
+                        <apex:input id="CustomerRef" type="text" styleClass="slds-input" value="{!CustomerRef}"/>
+                        
+                        <div id="CustomerRefError"  class="slds-text-color_error">  </div>
+                     
+                      </div>
+                     
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4" style="display:none">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Posting date</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <!-- apex:inputField styleClass="slds-input" value="{!quote.DocDate__c}"/ -->
+                        <apex:input id="postingDate" type="date" styleClass="slds-input" value="{!postingDate}"/>-->
+                        
+                        <div id="postingDateError"  class="slds-text-color_error">  </div>
+                     
+                      </div>
+                     
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                      
+                      <label class="slds-form-element__label" for="text-input-01">Contact</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        
+                        <!--apex:input type="text" styleClass="slds-input" value="{!contact}"/-->
+                        <apex:selectList id="contact"   styleClass="slds-input slds-combobox__inpu" value="{!contactoId}" onchange="assignContactEmail();" multiselect="false" size="1">
+                                <apex:selectOptions value="{!contactsOptionList}" />
+                        </apex:selectList>
+                     
+                     
+                      </div>
+                     
+                    </div>
+                    
+                        
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                       
+                          <div class="slds-form-element__control">
+                         
+                            
+                            <!--apex:input type="text" styleClass="slds-input" value="{!contact}"/-->
+                            <apex:inputCheckbox id="createContact" onclick="showHideNewContact(this)" value="{!createNewContact}"/>
+                             
+                          <label class="slds-checkbox__label" for="createContact">Create new Contact?</label>
+                         
+                          </div>
+                     
+                     
+                    </div> 
+                 
+                </div> <!-- fin segundo conjunto de campos -->
+                 
+             
+                <div id="createContactSection" class="slds-grid slds-wrap">  <!-- grupo de campos de creación de neuvo contacto-->
+                
+                
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">First name</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:input id="newContactName"  styleClass="slds-input" value="{!newContactName}"/>
+                        <div id="newContacNameError"  class="slds-text-color_error">  </div>
+                      </div>
+                     
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">*Last name (mandatory)</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:input id="newContacLast"  styleClass="slds-input" value="{!newContacLast}"/>
+                        <div id="newContacLastError"  class="slds-text-color_error">  </div>
+                      </div>
+                     
+                    </div>
+                    
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Email</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:input id="newContacEmail"  styleClass="slds-input" value="{!newContacEmail}"/>
+                        <div id="newContacEmailError"  class="slds-text-color_error">  </div>
+                      </div>
+                     
+                    </div>
+                    
+                </div> <!-- fin grupo de campos de creación de neuvo contacto -->
+                
+            
+                <div class="slds-grid slds-wrap"> <!---- tercer conjunto de campos ---> 
+                
+                            
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                          <label class="slds-form-element__label" for="text-input-01">Commission</label>
+                          <div class="slds-form-element__control">
+                            <apex:inputtext id="Commission" styleClass="slds-input custom4" value="{!Commission}"/>
+                            <div id="CommissionError"  class="slds-text-color_error">  </div>
+                          </div>
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                          <label class="slds-form-element__label" for="text-input-01">Currency</label>
+                          <div class="slds-form-element__control">
+                            <!--apex:input type="text" styleClass="slds-input" value="{!contact}"/-->
+                            <apex:selectList id="quoteCurrency"   styleClass="slds-input slds-combobox__inpu" value="{!quoteCurrency}" multiselect="false" size="1">
+                                    <apex:selectOptions value="{!currencyOptionList}" />
+                            </apex:selectList>
+                          </div>
+                        </div>
+                    </div>
+                    
+                </div> <!-- fin tercer conjunto de campos -->  
+                
+                <div class="slds-grid slds-wrap"> <!---- cuarto conjunto de campos ---> 
+
+                   <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    	<div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
+                              <label class="slds-form-element__label" for="text-input-01">Notify</label>
+                              <div class="slds-form-element">
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                                  <input id="NotifyInput" value="{!Notifydefaul}" class="slds-input" type="text" autocomplete="off" aria-autocomplete="list" role="combobox" 
+                                         onkeyup="getAccountList(this.id)" aria-expanded="false" aria-activedescendant="" />
+                                </div>
+                              </div>
+                              
+                              <div class="slds-lookup__menu" role="listbox" id="resultsNoti" style="display:none">
+                                <div class="slds-lookup__item">
+                                </div>
+                                <ul class="slds-lookup__list" role="presentation" id="ui_resultsNoti">                                                                                       
+                                </ul>                           
+                              </div>
+                            </div>
+                        <!-- Valor del place of delivery elegido  -->
+                               <apex:inputHidden value="{!NotifyId}" id="NotifyId"/>
+                               <apex:inputHidden value="{!NotifyName}" id="NotifyName"/>
+                        </div>
+
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                         <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
+                              <label class="slds-form-element__label" for="text-input-01">Consignee</label>
+                              <div class="slds-form-element">
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                                  <input id="ConsigInput" value="{!Consigneedefaul}" class="slds-input" type="text" autocomplete="off" aria-autocomplete="list" role="combobox" 
+                                         onkeyup="getAccountConsigList(this.id)" aria-expanded="false" aria-activedescendant="" />
+                                </div>
+                              </div>
+                              
+                              <div class="slds-lookup__menu" role="listbox" id="resultsConsig" style="display:none">
+                                <div class="slds-lookup__item">
+                                </div>
+                                <ul class="slds-lookup__list" role="presentation" id="ui_resultsConsig">                                                                                       
+                                </ul>                           
+                              </div>
+                            </div>
+                        <!-- Valor del place of delivery elegido  -->
+                                <apex:inputHidden value="{!ConsigneeId}" id="ConsigneeId"/>
+                                <apex:inputHidden value="{!ConsigneeName}" id="ConsigneeName"/>
+                    </div>
+                    
+                </div> <!-- fin tercer conjunto de campos -->
+            
+            <br/>
+            
+            
+            </apex:outputPanel>
+        
+            </apex:form>
+            
+                <apex:form onsubmit="return false;">
+                    <div class="slds-grid slds-wrap"> <!---- conjunto de botones --->
+                        <div class="slds-button-group slds-align_absolute-center" role="group">
+                                        
+                        
+                           <button class="slds-button slds-button_neutral" onclick=" nextSection('searchProductSection');"> Next
+                                <!-- <svg class="slds-button__icon slds-icon_small" 
+                                     aria-hidden="true"> 
+                                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#apex')}">
+                                </use>
+                              </svg>  -->
+                          </button>
+                        </div> <!-- End buttons group -->
+                    </div> <!-- fin segundo conjunto de botones -->
+                
+            </apex:form>
+        </div> <!-- End "quoteInformation" Div Id -->
+    </div>
+    
+    <!-------------------------END Quote section ------------------------------------->
+    
+    <br/>
+    
+        
+         <!-------------------------product list section ------------------------------------->
+    <div id="searchProductSection" class="slds-section">
+                
+        <!-- Accordion Title  -->
+        <h3 class="slds-section__title">
+        <button class="slds-button slds-section__title-action">
+              <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+              
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                        
+              </svg>  
+            Products
+        </button>   
+        </h3>
+        <!-- End accordion Title  -->
+        
+        
+         <div id="productList" class="slds-section__content">
+                
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <label class="slds-form-element__label" for="text-input-01">Product code/Product name</label>
+                  <div class="slds-form-element__control">
+                         <input type="text" id="nombreProd" onkeyup="doSearch();"  class="slds-input"/>
+                  </div>
+                </div>
+            <apex:form >  
+            <apex:pageMessages id="errors1" />
+            <apex:pageBlock Title="" id="block2">
+            
+            
+                <div id="collapseOne"  class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="table-responsive"   id="tablePage1">
+                    
+                           <apex:repeat id="Resultados2" var="a" value="{!MapSearchedProducts}" >
+                                  
+                                    <div class="slds-box slds-box_small" onclick="asignarSelectedProd('{!MapSearchedProducts[a].pb2.Id}' );">
+                                        <p>{!MapSearchedProducts[a].pb2.product2.Name}</p>
+                                        <p>{!MapSearchedProducts[a].pb2.product2.ProductCode}</p>
+                                    </div>
+                                    
+                            </apex:repeat> 
+                            
+                    </div>
+                </div>
+            </apex:pageBlock>
+            </apex:form>    
+        
+        </div>  <!-- End "productList" Div Id -->
+    </div>
+         <!-------------------------End product list section ------------------------------------->
+        
+    
+        
+    
+         <!-------------------------Selected product section ------------------------------------->
+    <div id="selectedProductSection" class="slds-section hide-section">
+           <Br/>
+        <!-- Accordion Title  -->
+        <h3 class="slds-section__title">
+        <button class="slds-button slds-section__title-action" >
+              <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+              
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                        
+              </svg>
+            
+            <!--  <svg aria-hidden="true" class="slds-icon desplegado" display="none">
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>
+                                                        
+              </svg> -->
+            <!--End Icon of the acordion -->    
+            Selected product
+        </button>   
+        </h3>
+        <!-- End accordion Title  -->
+        
+        
+
+        
+        <div id="productDetail" class="slds-section__content">
+            
+            
+            
+            <div class="slds-button-group" role="group">
+              <button class="slds-button slds-button_neutral" onclick="hideOnlyOne('selectedProductSection'); expandOnlyOneSection('searchProductSection');">
+                  <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#back')}"></use>
+                  </svg> Back
+                </button>
+            </div>
+            
+            <apex:form >
+                
+                <!-- ayuda setear de los valores ingresalos en el formulario a las variable del controlador -->
+                <apex:actionsupport event="onclick" rerender="dis"/>
+                    
+                <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+<!--DARF19/02/2020 <apex:actionFunction name="refreshPrice" action="{!refreshPrice}" reRender="priceFields, Errors0,Errors6 "  onComplete="maskFields(); validateCalculatePrice('{!currentSelectedProduct.listPrice}');" immediate="false">-->
+                <apex:actionFunction name="refreshPrice" action="{!refreshPrice}" reRender="priceFields, Errors0,Errors6 "  onComplete="maskFields(); " immediate="false">
+                    <apex:param name="paymentTerm" value="" assignTo="{!paymentTerm}"/>
+                    <apex:param name="incoterms" value="" assignTo="{!incoterms}"/>
+                    <apex:param name="deliveryPlace" value="" assignTo="{!deliveryPlace}"/>
+                    <apex:param name="deliveryDate" value=""/>
+                    <apex:param name="postingDate" value=""/>
+                    <apex:param name="contact" value=""/>
+                    <apex:param name="Commission" value="" assignTo="{!Commission}"/>
+                </apex:actionFunction>
+                                
+                <apex:pageBlock Title="" id="block3">
+                
+                
+                <div class="slds-grid slds-wrap"> <!---- primer conjunto de campos --->
+                 
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Product name/Product code/MI/Density</label>
+                     
+                     
+                        <apex:outputText styleClass="slds-input" value="{!selectProdDescription}"/>
+                     
+                     
+                    </div>
+                    
+                   <!-- se ocultó por solicitud de Alejandro 27-11-2019--> 
+                   <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">FOB Price (USD)</label>
+                     
+                     
+                        <apex:outputtext styleClass="slds-input" value="{!currentSelectedProduct.costoFOB}"/>
+                     
+                     
+                    </div>-->
+                    
+                 
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                     
+                      <label class="slds-form-element__label" for="text-input-01">Quantity</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:inputtext id="quantity" styleClass="slds-input custom4" value="{!currentSelectedProduct.quantity}"/>
+                            <div id="quantityError"  class="slds-text-color_error">  </div>
+                      </div>
+                     
+                    </div>
+                 
+                </div> <!---- primer conjunto de campos --->
+                
+                 
+                <div class="slds-m-top--small"></div>
+                 
+                
+                <div class="slds-grid slds-wrap"> <!---- segundo conjunto de campos --->
+                
+                
+                    <!--DARF 28/02/2020
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                     
+                    
+                      <label class="slds-form-element__label" for="text-input-01">Port of origin</label>
+                     
+                      <div class="slds-form-element__control">
+                     
+                        <apex:selectList id="originport"   styleClass="slds-input slds-combobox__inpu" onchange="asignarValoresControlador();" value="{!currentSelectedProduct.originPort}" multiselect="false" size="1">
+                                <apex:selectOptions value="{!portsOptionList}" />
+                        </apex:selectList>
+                        <div id="originportError"  class="slds-text-color_error">  </div>
+                     
+                      </div>
+                     
+                   </div>
+                    
+                    
+
+                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    
+                    
+                    
+                      <label class="slds-form-element__label" for="text-input-01">Container</label>
+                      <div class="slds-form-element__control">
+                          
+                        <apex:selectList id="container"   styleClass="slds-input slds-combobox__inpu" onchange="asignarValoresControlador();"  value="{!currentSelectedProduct.containerType}" multiselect="false" size="1">
+                                <apex:selectOptions value="{!containersOptionList}" />
+                        </apex:selectList>
+                        <div id="containerError" class="slds-text-color_error">  </div>
+                     
+                        
+                      </div>
+                    </div>
+                    -->
+                    
+                </div> <!-- fin segundo conjunto de campos -->
+                
+                
+                    <!-- apex:pageBlock tabStyle="slds-grid slds-wrap" id="block4"-->
+                    <apex:outputPanel id="priceFields" styleClass="slds-grid slds-wrap"> 
+                        
+                        <!--DARF 19/2/2020  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                          <label class="slds-form-element__label" for="text-input-01">List price</label>
+                          <div class="slds-form-element__control">
+                            <apex:outputtext id="listPrice" styleClass="slds-input custom4 listPriceField" value="{!currentSelectedProduct.listPrice}"/>
+                          </div>
+                        </div>
+                        -->
+                     
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                          <label class="slds-form-element__label" for="text-input-01">Sale price</label>
+                          <div class="slds-form-element__control">
+                             <!-- DARF 19/2/2020 <apex:input id="salesPrice" styleClass="slds-input custom4" value="{!currentSelectedProduct.salesPrice}"/>-->
+                            <apex:input id="salesPrice" styleClass="slds-input custom4" value="{!currentSelectedProduct.salesPrice}" />
+                            <div id="salesPriceError"  class="slds-text-color_error">  </div>
+                          </div>
+                        </div>
+                    <!-- /apex:pageBlock-->
+                    </apex:outputPanel>
+                    
+                            
+                <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+                <apex:actionFunction name="addToCart" action="{!addToCart}" oncomplete="hideOnlyOne('selectedProductSection'); expandOnlyOneSection('addedProductsSection');" reRender="block5,quantityAddedProductsPanel">
+                    <!-- apex:param name="productIdToRefresh" value="" assignTo="{!productIdToRefresh}"  / -->
+                </apex:actionFunction>
+
+                <!--DARF ValidateProduct"   
+                <apex:actionFunction name="validateNProduct" action="{!validateProduct}" oncomplete="" reRender="quantityAddedProductsPanel">
+                 <!-- apex:param name="productIdToRefresh" value="" assignTo="{!productIdToRefresh}"  / 
+                </apex:actionFunction>   -->
+                    
+
+                <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+                <apex:actionFunction name="addEdition" action="{!addEdition}" oncomplete="hideOnlyOne('selectedProductSection'); expandOnlyOneSection('addedProductsSection');" reRender="block5,quantityAddedProductsPanel">
+                    <apex:param name="prodIdToEdit" value=""/>
+                </apex:actionFunction>           
+                
+                </apex:pageBlock>
+                
+                
+            
+                
+            </apex:form>
+        <Br/>   <Br/>
+            
+                
+            <div class="slds-button-group slds-align_absolute-center" role="group">
+                <button class="slds-button slds-button_outline-brand" onclick="hideOnlyOne('selectedProductSection'); expandOnlyOneSection('searchProductSection');">
+                      <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#back')}"></use>
+                      </svg> Back
+                </button>
+
+                <button class="slds-button slds-button_outline-brand" id="addButton" onclick="agregarAlCarro('New');"> Add to cart
+                    <svg class="slds-button__icon" aria-hidden="true"> 
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#cart')}"></use>
+                    </svg> 
+                </button>
+                
+                <button class="slds-button slds-button_outline-brand" id="editButton" onclick="agregarAlCarro('Edit');">Edit product
+                    <svg class="slds-button__icon" aria-hidden="true"> 
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#cart')}"></use>
+                    </svg> 
+                </button>
+                
+            </div> <!-- End buttons group -->
+            
+        </div> <!-- End "productDetail" Div Id -->
+    </div>
+    
+    <!-------------------------Selected productdetail section ------------------------------------->
+           
+        
+        <Br/>
+        
+        
+         <!------------------------- Products Added ------------------------------------->
+    <div class="slds-section" id="addedProductsSection">
+       <!-- Accordion Title  -->
+        <h3 class="slds-section__title">
+        <button class="slds-button slds-section__title-action">
+              <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+              
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                        
+              </svg>
+            
+            <!--  <svg aria-hidden="true" class="slds-icon desplegado" display="none">
+                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>
+                                                        
+              </svg> -->
+            <!--End Icon of the acordion -->    
+            Added products
+            
+        </button> 
+        
+             <div class="slds-grid slds-float--right"> 
+                 
+                <svg class="slds-button__icon slds-icon_small slds-button__icon_right" aria-hidden="true"> 
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#cart')}">
+                </use>
+              </svg> 
+              <apex:outputPanel id="quantityAddedProductsPanel"> (<apex:outputText value="{!cantProdAdded}"/>) 
+                    <apex:form > <apex:inputHidden id="quantityProducts"  value="{!cantProdAdded}"/> </apex:form>
+              </apex:outputPanel>
+              
+              
+            </div>  
+        </h3>
+        <!-- End accordion Title  -->
+        
+    
+        <div id="listAddedProducts"  class="slds-section__content">
+        
+        
+        <apex:form >
+            <apex:pageMessages id="errors5" />
+            <apex:pageBlock Title="" id="block5">
+            <!--apex:outputPanel id="block5"-->
+            
+                <div id="collapseOne"  class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="table-responsive"   id="tablePage1">
+                    
+                           <apex:repeat id="Resultados3" var="a" value="{!MapAddedProd}" >
+                                  
+                                    <div class="slds-box slds-box_small">
+                                        <p>{!MapAddedProd[a].pb2.product2.Name}</p>
+                                        <p>{!MapAddedProd[a].pb2.product2.ProductCode}</p>
+                                        <p>sales price: {!MapAddedProd[a].salesPrice}</p>
+                                        <p>Quantity: {!MapAddedProd[a].quantity}</p>
+                                        <p>
+                                        <a onclick="confirmDeleteProduct('{!MapAddedProd[a].wrapperId}');">Delete</a>
+                                        </p>
+                                        <p>
+                                        <a onclick="asignarEditProd('{!MapAddedProd[a].wrapperId}');">Edit</a>
+                                        </p>
+                            
+
+                                    </div>
+                                    
+                            </apex:repeat> 
+                            
+                            <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+                            <apex:actionFunction name="removeFromCart" action="{!removeFromCart}" reRender="block5,quantityAddedProductsPanel">
+                                          <apex:param name="prodIdTodelete" value=""/>
+                            </apex:actionFunction>
+                                        
+                                        
+                            <!-- actionFunciont para recalcular los precios de venta de los productos"-->
+                            <apex:actionFunction name="recalculateSalesPrices" action="{!recalculateSalesPrices}" reRender="block5,quantityAddedProductsPanel" immediate="false" oncomplete="maskFields();">
+                                <apex:param name="paymentTerm" value="" assignTo="{!paymentTerm}"/>
+                                <apex:param name="deliveryPlace" value="" assignTo="{!deliveryPlace}"/>
+                            </apex:actionFunction>
+            
+            
+                    </div>
+                </div>
+            </apex:pageBlock>
+            <!--/apex:outputPanel-->
+        
+        </apex:form>
+        </div>  <!-- End "ProductInformation" Div Id -->
+    </div>
+     <!-------------------------End Expandible Products Added section ------------------------------------->
+        
+        <Br/>   <Br/>
+    
+        <script>  
+            // Preguntar si en realidad desea salir
+            function salir(){
+                        
+                var r = confirm("Do you want to cancel?");
+                if (r == true) {
+                    cancelar();
+                } 
+            }
+            
+            
+            // Preguntar si en realidad desea salir
+            function confirmDeleteProduct(prodToDelete){
+                            
+                var r = confirm("Delete the selected product?");
+                if (r == true) {
+                    removeFromCart(prodToDelete);
+                }
+            }
+        </script>       
+
+    <apex:form >  
+      
+
+        <!-- ayuda setear de los valores ingresalos en el formulario a las variable del controlador -->
+        <apex:actionsupport event="onclick" rerender="dis"/>
+            
+      
+        <apex:actionFunction name="cancelar" action="{!cancel}" rerender="#">
+        </apex:actionFunction>
+        
+        <!-- actionFunciont para invocar metodo que guarda cotización y redirecciona a la cotización recién creada"-->
+        <apex:actionFunction name="guardar" action="{!guardar}" onComplete="hideLoading(); showHideSendEmail('true','Ok'); goToByScroll('savedCorrectly');" rerender="emailQuoteSectionPanel, errors2">
+            <apex:param name="CustomerRef" value="" assignTo="{!CustomerRef}"/><!--//DARFCUSTOMERREF -->
+            		<apex:param name="paymentTerm" value="" assignTo="{!paymentTerm}"/>
+                    <apex:param name="incoterms" value="" assignTo="{!incoterms}"/>
+                    <apex:param name="deliveryPlace" value="" assignTo="{!deliveryPlace}"/>
+                    <apex:param name="deliveryDate" value=""/>
+                    <apex:param name="postingDate" value=""/>
+                    <apex:param name="contact" value=""/ >
+                    <apex:param name="Commission" value="" assignTo="{!Commission}"/>
+                    <apex:param name="newContactName" value="" assignTo="{!newContactName}"/>
+                    <apex:param name="newContacLast" value="" assignTo="{!newContacLast}"/>
+                    <apex:param name="newContacEmail" value="" assignTo="{!newContacEmail}"/>
+                    <apex:param name="NotifyId" value="" assignTo="{!NotifyId}"/>
+                    <apex:param name="ConsigneeId" value="" assignTo="{!ConsigneeId}"/>
+                    <apex:param name="saveNoClose" value="" assignTo="{!saveNoClose}"/>    
+        </apex:actionFunction>
+                
+      
+        <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+        <apex:actionFunction name="generarPDF" action="{!enviarPDF}">
+        </apex:actionFunction>
+      
+       
+        <apex:pageMessages id="errors2" />
+      
+    </apex:form> 
+    
+        <div class="slds-button-group slds-align_absolute-center" role="group">
+        
+            <script>
+            function showLoading(){
+                  
+                        j$('.SSNLoading1').show();
+                    // setTimeout( function(){  j$('.SSNLoading1').hide(); },3000);
+            }
+            function hideLoading(){
+                  j$('.SSNLoading1').hide();
+            }
+            </script>
+            <apex:image url="{!URLFOR($Resource.loading1)}" styleClass="SSNLoading1" width="100%" height="100%" style="position:absolute;z-index: 30;opacity: 0.5;display:none;"/> 
+
+            <apex:form > 
+                <apex:commandLink onclick="salir();" styleClass="slds-button slds-button_outline-brand" Value="Cancel"  reRender="#"> 
+                    <!-- <svg class="slds-button__icon slds-icon_small" 
+                         aria-hidden="true"> 
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#back')}">
+                    </use>
+                  </svg>-->  
+                </apex:commandLink>
+
+            </apex:form>
+                      
+            
+            
+            <button class="slds-button slds-button_outline-brand" id="saveButton" onclick="guardarQuote('cerrar');"> Save
+                <svg class="slds-button__icon slds-icon_small" 
+                aria-hidden="true"> 
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#save')}">
+                    </use>
+                </svg> 
+            </button>
+        
+            <button class="slds-button slds-button_outline-brand" id="emailSaveButton" onclick="guardarQuote('noCerrar');"> Save and email
+                <svg class="slds-button__icon slds-icon_small" 
+                 aria-hidden="true"> 
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#email')}"> </use>
+                </svg> 
+            </button>
+
+            <!--apex:commandLink onclick="showHideSendEmail('true','Ok');" styleClass="slds-button slds-button_outline-brand" Value="Save and email old" reRender="#" > 
+                <svg class="slds-button__icon slds-icon_small" 
+                     aria-hidden="true"> 
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#email')}">
+                </use>
+              </svg> 
+            </apex:commandLink -->
+                        
+        </div> <!-- End buttons group -->
+     
+        
+        
+        
+        
+
+        
+    
+   
+        <script>  
+        
+            // This is a functions that scrolls to #{blah}link
+            function goToByScroll(id) {
+                /*alert('2'+id);
+                document.getElementById('quoteSavedMessage').coappliBDate.focus();
+               
+                document.getElementById(id).scrollIntoView();
+                               // Scroll
+                j$('html,body').animate({
+                    scrollTop: j$("#" + id).offset().top
+                }, 'slow');
+                alert('2');*/
+            }
+        
+            // Muestra u oculta unicamente la sección enviada como parametro dependiendo de si toHide es true o no
+            function showHideSendEmail(show, quoteSaved)
+            {   
+            
+                if ( quoteSaved == 'Ok'){
+                
+                    
+                    if(show=='true'){ 
+                        j$('#emailQuoteSection').show();
+                        
+                            j$('#quoteSavedMessage').show();
+
+                    }else{
+                        j$('#quoteSavedMessage').hide();
+                        j$('#emailQuoteSection').hide();
+                    }
+                
+                
+                }
+            
+                maskFields();
+       
+            }
+            
+            
+            // Validar los campos olbigatorios de la sección de envío y generación de PDF de la cotización
+            function validateEmailSection()
+            {
+                var error = '' ;
+                j$('.slds-text-color_error').hide();
+                
+                
+                console.log('validateEmailSection1 error::'+ jQuery('[id$=contactEmail]').val());
+                
+                
+                
+                // si campos email son vacíos
+                if ( jQuery('[id$=contactEmail]').val()    == '' || jQuery('[id$=contactEmail]').val()    == null &&
+                     jQuery('[id$=aditionalEmails]').val() == '' || jQuery('[id$=aditionalEmails]').val() == null ) {
+                    
+                            error = 'At least one email field is mandatory: Contact email or Aditional emails.';
+                            j$('#contactEmailError').show();
+                            document.getElementById('contactEmailError').innerHTML=error;
+                }
+
+                console.log('validateEmailSection3 error:'+error);
+                if(error != '' ){
+                    j$('#errorSection').show();
+                    document.getElementById("errorMessage").innerHTML = error;
+                }else{
+                    enviarQuote();
+                }
+                
+                return error;
+            }
+            
+            
+        </script>       
+ 
+
+    
+        
+        <apex:form > 
+            
+            
+        <apex:pageMessages id="errors3" />
+            
+            <div id="emailQuoteSection">
+                <h3 class="slds-section__title"> Email section
+                </h3>
+                
+                
+                <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+                <apex:actionFunction name="enviarPDF" action="{!enviarPDF}"  reRender="emailQuoteSectionPanel, errors3" >
+                </apex:actionFunction>
+                
+                <apex:outputPanel id="emailQuoteSectionPanel">
+                
+                    
+                
+                    <apex:inputHidden value="{!savedCorrectly}" id="savedCorrectly"/>
+        
+                    <div id="quoteSavedMessage"  class="slds-text-color_success"> Quote successfully saved </div> 
+           
+                    <div class="slds-grid slds-wrap"> <!---- primer conjunto de campos --->
+                        
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                         
+                          <label class="slds-form-element__label" for="text-input-01">Contact email</label>
+                          <div class="slds-form-element__control">
+                            <apex:input id="contactEmail"  styleClass="slds-input" value="{!contactEmail}"/>
+                            <div id="contactEmailError"  class="slds-text-color_error">  </div>
+                          </div>
+                         
+                        </div>
+                        
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        
+                          <label class="slds-form-element__label" for="text-input-01">Additional emails (separated by commas)</label>
+                          <div class="slds-form-element__control">
+                            <apex:input id="aditionalEmails"  styleClass="slds-input" value="{!AditionalEmails}"/>
+                            <div id="AditionalEmailsError"  class="slds-text-color_error">  </div>
+                          </div>
+                          
+                        </div>
+                                            
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        
+                          <label class="slds-form-element__label" for="text-input-01">Message</label>
+                          <div class="slds-form-element__control">
+                            <apex:inputTextarea id="bodyMessage"  styleClass="slds-input" value="{!emailBody}"/>
+                          </div>
+                          
+                        </div>
+                    
+                    </div> <!-- fin primer conjunto de campos -->
+                    
+                    <Br/>
+                    
+                </apex:outputPanel>
+                <BR/>
+                    
+                <div class="slds-button-group slds-align_absolute-center" role="group">
+                
+                    <!--DARF--
+                    <apex:commandLink onclick="validateEmailSection();" styleClass="slds-button slds-button_outline-brand" Value="Save and send" reRender="emailQuoteSectionPanel" > 
+                        <svg class="slds-button__icon slds-icon_small" 
+                             aria-hidden="true"> 
+                            <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#save')}">
+                            </use>
+                        </svg> 
+                    </apex:commandLink>
+            		<apex:commandLink onclick="salir();" styleClass="slds-button slds-button_outline-brand" Value="Cancel"  reRender="#"> 
+                	</apex:commandLink>-->
+            
+                    <!--
+                        <apex:commandLink onclick="validateEmailSection();" styleClass="slds-button slds-button_outline-brand" Value="Save PDF" reRender="emailQuoteSectionPanel" > 
+                            <svg class="slds-button__icon slds-icon_small" 
+                                 aria-hidden="true"> 
+                                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#save')}">
+                            </use>
+                            </svg> 
+                        </apex:commandLink>
+                    <Br/>
+                        <apex:commandLink onclick="validateEmailSection();" styleClass="slds-button slds-button_outline-brand" Value="Save PDF and Send" reRender="emailQuoteSectionPanel, errors2" > 
+                            <svg class="slds-button__icon slds-icon_small" 
+                                 aria-hidden="true"> 
+                                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#email')}">
+                            </use>
+                            </svg> 
+                        </apex:commandLink>-->
+                    
+            <!-- <button class="slds-button slds-button_outline-brand" id="emailSavePDFButton" onclick="validateEmailSection();"> Save PDF and Send
+                <svg class="slds-button__icon slds-icon_small" 
+                                 aria-hidden="true"> 
+                                <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#email')}">
+                            </use>
+                </svg> 
+            </button> -->
+                     
+                        <!--apex:commandLink onclick="showHideSendEmail('false', '');" styleClass="slds-button slds-button_outline-brand" Value="Hide send email section" reRender="#" > 
+                        </apex:commandLink-->
+                </div>
+                
+                    <Br/><Br/>
+            </div>
+        </apex:form> 
+        
+    <!-- fin grupo de campos de creación de neuvo contacto -->
+
+    
+    </div> <!--  slds-scope -->
+    
+    </body>
+  </html>
+  
+  
+  
+<script>
+/*SLDS Sections*/
+j$('.slds-section__content').hide();
+j$('.hide-section').hide();
+j$('#errorSection').hide();
+j$('.slds-text-color_error').hide();
+j$('.slds-text-color_success').hide();
+j$('#createContactSection').hide();
+j$('#emailQuoteSection').hide();
+
+j$('.slds-section__title').find('button').find('svg').css('transition', '0.3s');
+j$('.slds-section__title').click(function(){
+
+        j$(this).parent().toggleClass('slds-is-open');
+        if(j$(this).parent().hasClass('slds-is-open')){
+            j$(this).parent().find('.slds-section__content').show();
+        }else{
+            j$(this).parent().find('.slds-section__content').hide();
+        }
+
+});
+/*SLDS Sections*/
+</script>
+  
+</apex:page>

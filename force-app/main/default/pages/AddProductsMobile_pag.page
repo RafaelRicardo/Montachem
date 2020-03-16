@@ -1,0 +1,576 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false"
+    docType="html-5.0" applyHtmlTag="false" applyBodyTag="false" extensions="AddQuoteProducts_ctr" standardController="quote" lightningStylesheets="false">
+ 
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <!-- Bootstrap core CSS -->
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, 'bootstrap-3.3.6-dist/css/bootstrap.css')}" />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"/>
+
+    <!-- apex:stylesheet value="{!URLFOR($Resource.bootstrapTableMaster, 'bootstrap-table-master/src/bootstrap-table.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapTableMaster, 'bootstrap-table-master/src/bootstrap-table.js')}" /
+    
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, 'bootstrap-3.3.6-dist/js/bootstrap.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, 'bootstrap-3.3.6-dist/js/bootstrap.min.js')}" />-->
+
+        
+    
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.1.62/jquery.inputmask.bundle.js"></script>
+    
+    <apex:includeScript value="//code.jquery.com/jquery-1.11.0.min.js"/> <!-- libreria para collapse -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js" ></script>
+    
+    
+    
+    
+    <script>   
+    
+        $ = jQuery.noConflict();
+
+        // Función al cargar eldocumento que carga todos los JQuery que contienen Maks
+        $(document).ready(function() 
+        {  
+
+                <!--=================================================-->
+                <!-- Script that Disables enter key for the entire page -->
+                $(document).keypress(
+                function(event){
+                     if (event.which == '13') {
+                        event.preventDefault();
+                      }
+                });
+                
+                console.log('paso 3');
+        });
+                
+        
+        
+        
+    </script>
+    
+    
+    <style>
+        .table {
+            width:100%;
+            white-space: nowrap;
+        }
+        .nameCol {
+            width:100%;
+        }
+        .table td {
+            padding: 0 5px;
+        }
+        .btn2{
+        background-color : #337AB7; 
+        border : solid 1px #ffffff;
+        color : #ffffff;
+        padding : 2px 2px;
+        }
+        
+    </style>
+
+
+      <script>
+      
+      function doSearch() {
+        searchServer(
+          document.getElementById("nombreProd").value,
+          document.getElementById("familia").value,
+          //document.getElementById("grupo").value,
+          //document.getElementById("subgrupo").value
+          );
+          
+          
+        //alert("p");
+        var list2= new Array();
+        list2=document.getElementById('blockTable');
+        alert("list2:"+list2.length);
+    }
+    </script> 
+    
+    <script>
+    
+    
+    
+    
+        window.onload = function() {
+            
+            document.getElementById("Panel1").style.display     ='block';
+            document.getElementById("formGroup").style.display     ='block';
+            document.getElementById("Panel2").style.display      ='none';
+            
+            console.log('paso 1');
+            maskFields();
+            console.log('paso 2');
+                        
+        }
+        
+        
+        
+        // Funcion que contiene la definición del mask para los campos de añño
+        function maskFields ()
+        {
+            <!--YEARS FIELDS MASK -->
+            var tb = [{ "mask": "###########.##"}, { "mask": "###########.##"}];
+ $(".decimal").inputmask('decimal', {
+    rightAlign: true
+  });
+  $(".currency").inputmask('currency', {
+    rightAlign: true
+  });
+  $(".custom1").inputmask({
+    mask: "99[.99]",
+    greedy: false,
+    definitions: {
+      '*': {
+        validator: "[0-9]"
+      }
+    },
+    rightAlign: true
+  });
+  $(".custom2").inputmask({ 'alias': 'decimal', 'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 'digitsOptional': false, 'placeholder': '0.00', rightAlign : true,clearMaskOnLostFocus: !1 });
+  
+  $(".custom3").inputmask({
+    'alias': 'decimal',
+    'mask': "99[.99]",
+    rightAlign: true
+  });
+             $('.maskDecimalField').inputmask({
+                'alias': 'decimal',
+                'mask': "9999999999999[.99]",
+                rightAlign: true
+              }); 
+                
+            console.log('paso 1.2');
+        }
+        
+        // Funcion que contiene la definición del mask para los campos de añño
+        function masksYearFields2 ()
+        {
+            <!--YEARS FIELDS MASK -->
+            
+            $('.txt-YearField').inputmask({ 
+                mask: tb, 
+                placeholder: '',
+                greedy: false, 
+                definitions: { '#': { validator: "[0-9]", cardinality: 1}}
+                });
+                
+                console.log('paso 1.2');
+        }
+        
+      
+        
+        
+        function hidePanel1(option)
+        { 
+            document.getElementById("Panel1").style.display ='none';
+            document.getElementById("formGroup").style.display   ='none';
+            document.getElementById("Panel2").style.display ='block'; 
+            maskFields();
+        }
+        
+        
+        function hidePanel2(option)
+        { 
+            document.getElementById("Panel1").style.display ='block';
+            document.getElementById("formGroup").style.display   ='block';
+            document.getElementById("Panel2").style.display ='none'; 
+            maskFields();
+        }
+        
+        function checkAll(cb)
+        {
+         var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+            if(inputElem[i].id.indexOf("checkedone")!=-1)
+             inputElem[i].checked = cb.checked;
+            }
+        }
+        
+        function validarCantidad(element, cantDispo, errorCantidad){
+          if (element.value >cantDispo){
+            element.parentNode.childNodes[2].setAttribute("Class","alert alert-danger"); 
+            element.parentNode.childNodes[2].innerHTML=  "La cantidad de venta digitada es mayor a la cantidad disponible.";
+        
+          } else{
+            element.parentNode.childNodes[2].setAttribute("Class","hidden"); 
+            element.parentNode.childNodes[2].innerHTML=  "hidden";
+          }
+        }
+        
+        
+        function validarCantidadCero(element, cantDispo, errorCantidad){
+        
+        
+          //   alert("0. Entra"+element.checked);
+         var inputElem = document.getElementsByTagName("div");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("cantidadVenta")!=-1 ){
+                
+                }
+             //inputElem[i].checked = cb.checked;   && element.checked=='true'
+            }
+        
+      //  alert("1."+element.parentNode.childNodes[1].id +"-"+cantDispo);
+          if (element.value >cantDispo){
+            element.parentNode.childNodes[2].setAttribute("Class","alert alert-danger"); 
+            element.parentNode.childNodes[2].innerHTML=  "La cantidad de venta digitada es mayor a la cantidad disponible.";
+        
+          }else if (element.value == 0){
+            element.parentNode.childNodes[2].setAttribute("Class","alert alert-danger"); 
+            element.parentNode.childNodes[2].innerHTML=  "La cantidad de venta no puede se igual a 0.";
+          alert("2."+element.value +"-"+cantDispo);
+        
+          } else{
+            element.parentNode.childNodes[2].setAttribute("Class","hidden"); 
+            element.parentNode.childNodes[2].innerHTML=  "hidden";
+          }
+        }
+    </script>
+  </head>
+
+  <body>
+
+  <div class="container">
+    
+    <apex:pageMessages id="errors" />
+    
+    <h3 class="text-muted">Add products to Quote: {!quote.Name}</h3>
+    <h4 class="text-muted">Port of delivery: {!quote.Place_of_delivery__r.Name}</h4>
+    <apex:form id="form1">
+    
+    
+        <div class="bootstrap" style="padding: 10px;" id="formGroup">   
+       
+       
+       
+            <form class="form-inline">
+                <apex:actionFunction name="searchServer" action="{!runSearch}" rerender="block2,block3, errors">
+                  <apex:param name="productName" value="" />
+                  <apex:param name="family" value="" />
+                  <!-- apex:param name="Reference" value="" />
+                  <apex:param name="Brand" value="" / -->
+                </apex:actionFunction>
+                <div class="row">
+                
+                      <div class="form-group col-sm-6">
+                        <label for="nombreProd" class="control-label">Product code/Product name</label>
+                         <input type="text" id="nombreProd" onkeyup="doSearch();"  class="form-control"/>
+                      </div>
+                      
+                      <div class="form-group col-sm-6">
+                        <label for="recipient-name" class="control-label">Family/type</label>
+                        <input type="text" id="familia" onkeyup="doSearch();"  class="form-control"/>
+                      </div>
+                              
+                </div>
+                                                 
+                            
+                <!-- div class="row"> 
+                             
+                            <div class="form-group col-sm-6">
+                                <label for="recipient-name" class="control-label">Reference</label>
+                                <input type="text" id="grupo" onkeyup="doSearch();"  class="form-control"/>
+                            </div>
+                            
+                            <div class="form-group col-sm-6">
+                                <label for="recipient-name" class="control-label">Brand:</label>
+                                <input type="text" id="subgrupo" onkeyup="doSearch();"  class="form-control"/>
+                            </div>  
+                              
+                </div -->
+                              
+                <!-- apex:commandButton value="Filtrar cuentas" action="{!searchElements}" reRender="div1,Resultados2" styleClass="btn btn-primary"/>
+                <apex:commandButton value="Localizar cuentas" action="{!GetSelected}" reRender="Resultados"/>
+                <apex:commandButton value="Limpiar mapa" onclick="cleanAllElements()" reRender="Resultados" styleClass="btn btn-success"/--> 
+            </form>
+        </div>
+    </apex:form>
+      
+      
+    
+    <apex:form >
+    
+    
+        <!--================================================PANEL 1 -  BUSQUEDA DE PRODUCTOS =========================================-------->  
+        <div class="panel panel-default" id="Panel1">
+        
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                       Show/Hide results
+                    </a>
+                </h4>
+            </div>
+       
+       
+            <apex:pageMessages id="errors1" />
+            <apex:pageBlock Title="" id="block2">
+                <div id="collapseOne"  class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="table-responsive"   id="tablePage1">
+                        <table class="table table-striped" id="table1">
+                          <thead>
+                            <tr>
+                              <th>
+                                     <apex:inputCheckbox >
+                                        <apex:actionSupport event="onclick" onsubmit="checkAll(this)" rerender="none"/>
+                                     </apex:inputCheckbox></th>
+                              <th>Product Name</th>
+                              <th>Product code</th>
+                              <th>Type/Family</th>
+                              <th>Density (g/cm³)</th>
+                              <th>Melt Index </th>
+                              <th>Reference</th>
+                              <th>Supplier</th>
+                              <th>FOB cost(USD)</th>
+                              <th>Records to display</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                           <apex:repeat id="Resultados2" var="a" value="{!SearchedProducts}" >
+                                <tr>
+                                  <td>
+                                     <apex:inputCheckbox value="{!a.selected}" id="checkedone">
+                                      <apex:actionSupport event="onclick" rerender="none"/>
+                                     </apex:inputCheckbox> 
+                                  </td>
+                                  <td> <apex:outputField value="{!a.pb2.product2.Name}"/></td>
+                                  <td> <apex:outputField value="{!a.pb2.product2.ProductCode}"/></td>
+                                  <td> <apex:outputField value="{!a.pb2.product2.family}"/></td>
+                                  <td> <apex:outputField value="{!a.pb2.product2.Density__c}"/></td>
+                                  <td> <apex:outputField value="{!a.pb2.product2.MI__c}"/></td>
+                                  <td> <apex:outputText value="{!a.costoFOB}" id="checkedone2"/></td>
+                                  <td> <apex:outputText value="{!a.listPrice}"/></td>
+                                  <td> <apex:outputText value="{!a.salesPrice}"/></td>
+                                  <!-- td> <apex:inputText value="{!a.decRowsQty}"/></td> -->
+                                  <td> 
+                                  <apex:selectList styleClass="form-control" onchange="getProductPrices();" value="{!a.decRowsQty}" multiselect="false" size="1">
+                                        <apex:selectOptions value="{!decRowsQtyList}" />
+                                   </apex:selectList>
+                                  </td>
+                                  <td> <apex:outputText value="{!a.mensajeError}"/></td>
+                                  
+                                  
+                                </tr>
+                            </apex:repeat> 
+                          </tbody>
+                        </table>
+                    </div>
+                    <div class="Container" id="buttonsPage1">
+                        <apex:pageblockButtons >
+                         <apex:pageMessages id="errors2" />   
+                         <nav>
+                              <ul class="pagination">
+                                <li><apex:commandButton value="<<" rerender="block2" action="{!beginning}"  disabled="{!EnablePrev}" styleClass="btn btn-primary btn-sm"/></li>
+                                <li><apex:commandButton value="<" rerender="block2" action="{!previous}" disabled="{!EnablePrev}" styleClass="btn btn-primary btn-sm" /></li>
+                                <li><apex:commandButton value=">" rerender="block2" action="{!next}" disabled="{!EnableNxt}" styleClass="btn btn-primary btn-sm"/></li>
+                                <li><apex:commandButton value=">>" rerender="block2" action="{!end}" disabled="{!EnableNxt}" styleClass="btn btn-primary btn-sm"/></li>
+                              </ul>
+                            
+
+
+                <div class="row"> 
+                                                         
+                            <div class="form-group col-sm-3">
+                                <apex:pageBlockSection >
+                                  <apex:commandButton action="{!cancel}" styleClass="btn btn-primary btn-sm" value="Cancel" immediate="true"/>
+                                </apex:pageBlockSection>  
+                            </div>  
+                            
+                            <div class="form-group col-sm-3">
+                                <apex:pageBlockSection >
+                                  <apex:commandButton action="{!assignSelected}" styleClass="btn btn-primary btn-sm" value="Add" reRender="block3,block2"/>
+                                </apex:pageBlockSection> 
+                            </div>  
+                            
+                            <div class="form-group col-sm-3">
+                                <apex:pageBlockSection >
+                                  <apex:commandButton value="Continue" action="{!continuar}" styleClass="btn btn-primary btn-sm" onclick="hidePanel1();" reRender="errors,errors1,errors2"/>
+                                </apex:pageBlockSection>
+                            </div>
+                            
+
+                            <div class="form-group col-sm-3">
+                            
+                              <apex:commandButton styleClass="btn-primary btn2" value="Products Added:{!cantProdAdded}" disabled="true"/>
+                                
+                               <!-- apex:image id="theImage2" value="{!$Resource.cart2}" width="50" height="50"/ -->
+                               <!-- apex:commandbutton image="{!URLFOR($Resource.cart2)}" id="SaveChanges" value="Added" /-->﻿
+                            </div>
+                              
+                </div>                          
+
+                            <!--table class="table">
+                              <thead>
+                                  <th> 
+                                <tr>
+                                <td><apex:pageBlockSection >
+                                  <apex:commandButton value="Continue" action="{!continuar}" onclick="hidePanel1();" reRender="errors,errors1,errors2"/>
+                                </apex:pageBlockSection> </td>   
+                                  <td> 
+                                <apex:pageBlockSection >
+                                  <apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+                                </apex:pageBlockSection>   </td>   
+                                  <td> 
+                                <apex:pageBlockSection >
+                                  <apex:commandButton action="{!assignSelected}" value="Add" reRender="block3"/>
+                                </apex:pageBlockSection>  </td>      
+                                </tr>  
+                                </th>
+                              </thead>
+                            </table-->
+                              
+                         </nav>
+                        </apex:pageblockButtons>
+                    </div>
+                </div>
+            </apex:pageBlock>
+         
+        </div>
+        <!--================================================FIN PANEL 1 -  BUSQUEDA DE PRODUCTOS =========================================-------->
+   
+   
+   
+        <!--================================================PANEL 2 -  PRODUCTOS SELECCIONADOS =========================================-------->
+        <div class="panel panel-default" id="Panel2">
+        
+            <apex:pageMessages id="errors3" />
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                       Show/Hide selected products
+                    </a>
+                </h4>
+            </div>  
+            <!-- actionFunciont para refrescar la tabla "Productos seleccionados"-->
+            <apex:actionFunction name="getProductPrices" action="{!refreshListPrices}" reRender="block3,errors" oncomplete="maskFields();" >
+                <!-- apex:param name="productIdToRefresh" value="" assignTo="{!productIdToRefresh}"  / -->
+            </apex:actionFunction>
+            
+            <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <apex:pageBlock Title="" id="block3">
+              <div class="table-responsive">
+                <table class="table winner-table table-striped" id="table2">
+                  <thead>
+                    <tr>
+                      <th>
+                            <apex:inputCheckbox >
+                                <apex:actionSupport event="onclick" onsubmit="checkAll(this)" rerender="none"/>
+                            </apex:inputCheckbox></th>
+                      <th>Product code</th>
+                      <th>Density</th>
+                      <th>MI </th>
+                      <th>Unit FOB cost (USD)</th>
+                      <th>Quantity</th>
+                      <th>Port of Origin</th>
+                      <th>Container</th>
+                      <th>Unit List price (USD)</th>
+                      <th>Unit Sale Price (USD)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+    
+                   <apex:repeat id="Resultados2" var="a" value="{!selectedProducts2}" >
+                        <tr>
+                          <td>
+                             <apex:inputCheckbox value="{!a.selected}" id="checkedone">
+                              <apex:actionSupport event="onclick" rerender="none"/>
+                             </apex:inputCheckbox> 
+                          </td>
+                          <td> <apex:outputField value="{!a.pb2.product2.Name}"/></td>
+                          <td> <apex:outputField value="{!a.pb2.product2.Density__c}"/></td>
+                          <td> <apex:outputField value="{!a.pb2.product2.MI__c}"/></td>
+                          <td> <apex:outputText value="{!a.costoFOB}" id="checkedone2"/></td>
+                          <td> <apex:inputText value="{!a.quantity}" styleClass="form-control decimal"/>
+                          
+                          
+                              
+                           </td>
+                          <td> <apex:selectList id="originPort"   styleClass="form-control" onchange="getProductPrices();" value="{!a.originPort}" multiselect="false" size="1">
+                            <apex:selectOptions value="{!portsOptionList}" />
+                           </apex:selectList>
+                          </td>
+                          <td> <apex:selectList id="tipoContenedor" styleClass="form-control" onchange="getProductPrices();" value="{!a.containerType}" multiselect="false" size="1">
+                            <apex:selectOptions value="{!containersOptionList}" />
+                           </apex:selectList>
+                          </td>
+                          
+                          <td> <apex:outputText value="{!a.listPrice}" styleClass="form-control"/></td>
+                          <td> <apex:inputText value="{!a.salesPrice}" styleClass="form-control custom2"/></td>
+                          <td> <apex:outputText value="{!a.mensajeError}"/></td>
+                          
+                          
+                        </tr>
+                    </apex:repeat> 
+                  </tbody>
+                </table>
+              </div>
+              
+              
+                <apex:pageblockButtons >
+                 <apex:pageMessages id="errors2" />   
+                 <nav>                      
+                  <table class="table">
+                  <thead>
+                      <th> 
+                    <tr>
+                    <td><apex:pageBlockSection >
+                      <apex:commandButton action="{!continuar}" styleClass="btn btn-primary btn-sm" value="Back" onclick="hidePanel2();" reRender="errors,errors1,errors2"/>
+                        </apex:pageBlockSection> </td>   
+                      <td> 
+                    <apex:pageBlockSection >
+                      <apex:commandButton action="{!cancel}" styleClass="btn btn-primary btn-sm" value="Cancel" immediate="true"/>
+                    </apex:pageBlockSection>   </td>   
+                      <td> 
+                    <apex:pageBlockSection >
+                      <apex:commandButton action="{!guardar}" styleClass="btn btn-primary btn-sm" value="Save" reRender="block3" oncomplete="maskFields();"/>
+                    </apex:pageBlockSection>  </td>      
+                    </tr>  
+                    </th>
+                  </thead>
+                </table>
+                      
+                 </nav>
+                </apex:pageblockButtons>
+              
+            </apex:pageBlock>
+            </div> <!-- end collapseTwo-->
+        
+        </div>  <!-- end panel2-->
+          
+        <!--================================================ FIN PANEL  2- PRODUCTOS SELECCIONADOS =========================================-------->
+          
+
+</apex:form>          
+
+
+        
+      <!-- Site footer -->
+      <footer class="footer">
+        <p>Montahcem.</p>
+      </footer>
+   </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="Justified%20Nav%20Template%20for%20Bootstrap_files/ie10-viewport-bug-workaround.js"></script>
+  
+</body></html>
+
+         
+
+</apex:page>

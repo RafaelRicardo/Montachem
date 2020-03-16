@@ -1,0 +1,273 @@
+<apex:page controller="OrderPdf_ctr" showHeader="false" renderAs="pdf" standardStyleSheets="false" applyBodyTag="false">
+
+   <apex:form style="font-family: Arial Unicode MS;   font-size: 8.5pt; font-weight: bold;">
+   
+
+
+<!-- style type="text/CSS">	
+.hr { 
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 3px;
+}
+.negritatitulo{
+  font:bold 26px "Arial";
+}
+.negritaconsulta{
+  font:bold 12px "Arial";
+}
+
+ .dollars:before { content:'$'; }
+
+</style -->
+<!--  tabla principal -->
+
+
+
+<table  width="100%">
+    <tr> <!-- Logo y sección de "Sales contract No:" -->
+        <td width="50%">
+            <!--  tabla izquierda superior -->
+            
+                    <apex:image url="{!URLFOR($Resource.pdf,'pdf/logo2.png')}" width="350" />                    
+            
+            <!-- fin  tabla izquierda superior -->
+            
+        </td>
+        <td width="50%">
+            
+            <!--  tabla derecha superior -->
+            <table height="100%">
+                <tr>
+                    <td class="negritatitulo" >Sales Contract No:</td>
+                    <td>{!objDatosEstaticos.ProformaVoice}</td>
+                </tr>
+
+                <tr>
+                    <td class="negritatitulo" >Date:</td>
+                    <td>{!IF(isBlank(objDatosEstaticos.DateFieldWithOutTime), objDatosEstaticos.DateField, objDatosEstaticos.DateFieldWithOutTime)} </td>
+                </tr>
+                <tr>
+                    <td class="negritatitulo" >Terms:</td>
+                    <td>{!objDatosEstaticos.Terms}</td>
+                </tr>
+                <tr>
+                    <td class="negritatitulo" >Incoterms:</td>
+                    <td>{!objDatosEstaticos.Icoterms}
+                </td>
+                </tr>
+                <tr>
+                    <td class="negritatitulo" >Customer Ref:</td>
+                    <td>{!objDatosEstaticos.CustomerRef}</td>
+                </tr>
+                <tr>
+                    <td class="negritatitulo" >Estimated Time Of Departure:</td>
+                    <td>{!objDatosEstaticos.Deliverydate}</td>
+                </tr>
+                <tr>
+                    <td class="negritatitulo" >Sales Rep:</td>
+                    <td>{!objDatosEstaticos.SalesRep}</td>
+                </tr>
+
+
+            </table>
+            <!--  fin tabla derecha superior -->
+              
+      </td>
+    </tr> <!-- Fin Logo y sección de "Sales contract No:" -->
+    
+    <br/>
+    <!------------------ siguiente seccion de la tabla  ---------------->
+
+    
+    <!-- Bill To and Ship To -->
+
+    <table class="tg" width="100%">
+        <tr>
+            <th>Bill To:</th>
+            <th>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , 'Ship to:',' ')}</th>
+        </tr>
+        <tr >
+            <td colspan="5" height="1" > <hr/></td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.NombreCuenta}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , IF( NOT(ISBLANK(objOportunidad.Consignee__c)),objOportunidad.Consignee__r.Name,objDatosEstaticos.NombreCuenta ),' ') }</td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.NombreContacto}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , objDatosEstaticos.NombreContacto, ' ') }</td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.DirecionCuenta}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , 
+                    IF( NOT(ISBLANK(objOportunidad.Consignee__c)), objOportunidad.Consignee__r.Address_Line_1_Bill_1__c & '. ' & objOportunidad.Consignee__r.Address_Line_2_Bill_1__c,objDatosEstaticos.DirecionCuenta),' ') }</td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.Ciudad}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , IF( NOT(ISBLANK(objOportunidad.Consignee__c)), objOportunidad.Consignee__r.City_Bill_1__c,objDatosEstaticos.Ciudad) ,' ') }</td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.Pais}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , IF( NOT(ISBLANK(objOportunidad.Consignee__c)), objOportunidad.Consignee__r.Bill_main_Country__r.Name,objDatosEstaticos.Pais) ,' ')}</td>
+        </tr>
+        <tr>
+            <td>{!objDatosEstaticos.TaxId}</td>
+            <td>{!IF( (objAccount.country__r.Name= 'Brazil' || objAccount.country__r.Name= 'Brasil') , IF( NOT(ISBLANK(objOportunidad.Consignee__c)), 'Tax Id:' &  objOportunidad.Consignee__r.Federal_tax_ID__c, objDatosEstaticos.TaxId) ,' ')}</td>
+        </tr>
+    </table>
+    
+            
+    <!--  Inicio Bill To --><!-- fin columnas  Bill to y Ship To -->
+
+    
+    <br/>
+    
+    <!--                             PRODUCTOS                        -->
+    
+    <tr>
+        <td colspan="2" width="100%">
+        
+          <table width="100%"  >
+                <tr >
+                    <td colspan="5" height="1" > <hr/></td>
+                </tr>
+                <tr height="10">
+                    <td class="negritatitulo" style="" width="10%" height="10">Qty/MT </td>
+                    <td class="negritatitulo" height="30">PRODUCT CODE</td>
+                    <td class="negritatitulo" width="20%" height="10">DESCRIPTION</td>
+                    <td class="negritatitulo" width="20%" height="10">PRICE</td>
+                    <td class="negritatitulo" width="20%" height="10">LINE AMT</td>
+                    
+                </tr>
+                <tr >
+                    <td colspan="5" height="1" > <hr/></td>
+                </tr>
+                <apex:repeat var="item" value="{!lstProductos}">
+                    <tr>
+                        <td class="negritatitulo">{!item.Quantity__c}</td>
+                        <td class="negritatitulo">{!item.Product__r.ProductCode}</td>
+                        <td class="negritatitulo">{!item.Product__r.name} </td>
+                      <!--  <td class="negritatitulo">{!item.Sales_price__c} {!item.Order__r.opportunity__r.SyncedQuote.Currency__c}</td>-->
+                        <td>  <apex:outputText style="negritatitulo" value="{0,number,###,###,##0.00}">
+                                <apex:param value="{!item.Sales_price__c}"/>
+                            </apex:outputText> {!item.Order__r.opportunity__r.SyncedQuote.Currency__c}
+                        </td>
+                        <!--<td class="negritatitulo">{!item.Total_sales_price__c} {!item.Order__r.opportunity__r.SyncedQuote.Currency__c}</td>-->
+                        <td>  <apex:outputText style="negritatitulo" value="{0,number,###,###,##0.00}">
+                                <apex:param value="{!item.Total_sales_price__c}"/>
+                            </apex:outputText> {!item.Order__r.opportunity__r.SyncedQuote.Currency__c}
+                        </td>
+                    </tr>
+                </apex:repeat>
+
+                  
+                <tr>
+                    <td colspan="2"><span class="negritatitulo">Remarks</span><br/>{!lstOrden[0].remarks__c}</td>
+                    <td colspan="3"><p class="negritaconsulta">Customer agrees to fullfill the terms and conditions under this proforma if all requirements are met.</p></td>
+                    
+                </tr>
+                <tr >
+                    <td colspan="5" height="1" > <hr/></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="negritatitulo">TOTAL USD - {!objDatosEstaticos.Icoterms} -  {!objDatosEstaticos.placeOfDelivery}</td>
+                    
+                    <td>  <apex:outputText style="negritatitulo" value="{0,number,###,###,##0.00}">
+                                <apex:param value="{!Total}"/>
+                          </apex:outputText> {!strCurrency}
+                    </td>
+                </tr>
+        </table>
+           
+        </td>
+        
+    </tr>
+    
+    
+    <!--                            siguiente seccion de la tabla    -->
+    
+    
+    
+    <tr>
+        <td colspan="2">
+        
+           <p>By Signing this document customer agree  to all terms and conditions as descibed in this document.
+           <br/>Sales contract is subject to cancellation if customer is past due on other invoices.</p>  
+                 <b class="negritatitulo" >Amt in words:</b><br/>
+                 <b class="negritatitulo" >{!lstOrden[0].Order_total_value_in_words__c} </b>
+                 
+           <p  class="negritatitulo" >Please have electronic remittances sent to: </p>
+           <ul>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','Bank: Citibank, N.A. London', 'Bank/Banco: Citibank, N.A.')} </li>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','Beneficiary: Montachem International, Inc', 'Beneficiary/Beneficiario: Montachem International Inc.')} </li>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','Account No.: 17577354', 'Account No./Cuenta No.: 30996339')}  </li>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','Swift: CITIGB2L','Bank address/Dirección Banco: 3800 Citibank Center Blog B, 3rd Floor Tampa FL 33610' )}</li>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','IBAN: GB02CITI18500817577354', 'ABA/Routing: 021000089')}</li>
+                  <li>{!if(objOportunidad.SyncedQuote.Currency__c='EUR','Swift: CITIGB2L', 'Swift: CITIUS33')}</li>
+                  
+            </ul>
+           
+        </td>
+        
+        
+        
+    </tr>
+    
+    
+    
+    <!--                            siguiente seccion de la tabla   FIRMAS -->
+    <tr>
+        <td colspan="2">
+          <table  width="100%" >
+            <tr>
+                <td width="20%">
+                    <apex:image url="{!URLFOR($Resource.pdf,'pdf/firma1.png')}" width="150"/>
+                </td>
+                <td width="28%"></td>
+                <td width="30%"></td>
+            </tr>
+            <tr>
+                <td >
+                    <hr />
+                    <br/><span class="negritatitulo" >JC Avila</span> 
+                    <br/><span class="negritatitulo" >COO </span>
+                    <br/><span class="negritatitulo" >Montachem International, Inc.</span>
+
+                </td>
+                <td >
+                 
+
+                </td>
+                <td valign="top">
+                    <hr />
+                    <br/><span class="negritatitulo" >ACCEPTANCE  </span>
+                    <br/><span class="negritatitulo" >BY CUSTOMER</span>
+                    <br/>
+                </td>
+            </tr>
+            
+          </table>
+           
+        </td>
+        
+        
+        
+    </tr>
+    
+    
+</table>
+
+
+
+
+
+
+
+   </apex:form>
+
+</apex:page>

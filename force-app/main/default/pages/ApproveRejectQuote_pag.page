@@ -1,0 +1,118 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" 
+    docType="html-5.0" applyHtmlTag="false" applyBodyTag="true" extensions="ApproveRejectQuote_ctr" standardController="quote"  > 
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"/>
+<html   lang="en" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+
+  <apex:includeLightning />
+
+        <apex:stylesheet value="{!URLFOR($Resource.ddcAssess_SLDS212, 'assets/styles/salesforce-lightning-design-system-scoped.min.css')}" />
+
+       
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <!-- Bootstrap core CSS -->
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, 'bootstrap-3.3.6-dist/css/bootstrap.css')}" />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"/>
+
+    
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"/>
+    <apex:includeScript value="//code.jquery.com/jquery-1.11.0.min.js"/> <!-- libreria para collapse -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js" ></script>
+
+ 
+  </head>
+
+  <body>
+            <div class="form-group">
+                </div>
+            
+        <div class="container">
+    <apex:image url="{!URLFOR($Resource.loading1)}" styleClass="SSNLoading1" width="70%" height="70%" style="position:absolute;z-index: 30;opacity: 0.5;display:none;"/>
+    <apex:form >
+        
+        <apex:actionStatus id="showStatus" >
+            <apex:facet name="start" >Processing 
+            </apex:facet>
+    	</apex:actionStatus>
+          <div class="panel panel-default" style="padding: 10px;">   
+            	              
+              <apex:pageMessages id="errors" />
+                            
+            <h3 class="text-muted">Approve or Reject Quote -<Span>{!approver}</span></h3>
+
+                <div class="form-group">
+                
+                    <tr>
+                    <td>
+                           <apex:commandButton value="Approve"  action="{!approveRecord}"  status="showStatus" styleClass="slds-button slds-button_neutral" onclick="showLoading();"/>
+                           <apex:commandButton value="Reject"  action="{!rejectRecord}"  status="showStatus" styleClass="slds-button slds-button_brand" onclick="showLoading();"/>
+                           <apex:commandButton value="Back to Sales Rep" action="{!backToDraft}" styleClass="slds-button slds-button_neutral" disabled="{!disableLostReason}" onclick="showLoading();"/>
+                           <apex:commandButton value="Back"  action="{!cancel}"  styleClass="slds-button slds-button_brand" onclick="showLoading();"/>
+                           </td>       
+                           <td>      
+                           </td>      
+                           <td>   
+                           </td>        
+                    </tr>  
+                </div>
+                           
+                            
+                
+                
+                <div class="form-group">     
+                  <table>
+                  <thead>
+                      <th> 
+                        <label for="LostReason" class="control-label">Lost reason</label>
+                          <apex:selectList id="LostReason" styleClass="form-control" value="{!lostReason}" disabled="{!disableLostReason}" required="{!requiredLostReason }" multiselect="false" size="1">
+                            <apex:selectOptions value="{!lostReasonOptionList}" />
+                           </apex:selectList> 
+                    </th>
+                  </thead>
+                </table> 
+                </div>
+                
+
+        
+            <div class="form-group">
+              <div class="slds-grid slds-grid_align-center">
+
+                  <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="text-input-05">Comments</label>
+                    
+                    
+                    <div class="slds-form-element__control">
+                       <apex:inputTextarea label="Comments2" styleClass="form-control" value="{!comments}" />
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+         </div>
+        
+    </apex:form>
+        </div>
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+                            <script src="Justified%20Nav%20Template%20for%20Bootstrap_files/ie10-viewport-bug-workaround.js"></script>
+    <script> 
+          function showLoading(){
+          console.log('entro loading');
+          $('.SSNLoading1').show();
+          // setTimeout( function(){  j$('.SSNLoading1').hide(); },3000);
+      }
+    </script>
+
+</body></html>
+
+
+</apex:page>
